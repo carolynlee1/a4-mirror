@@ -68,13 +68,14 @@
   
 # Create a dataframe with only the county level observations from the binge_driking dataset 
 # (i.e., exclude state/national estimates)
+# This should include "county-like" areas such as parishes and boroughs
 
   
 # What is the average county level of binge drinking in 2012 for both sexes?
 
 
 # What is the minimum county level of binge drinking in each state (in 2012 for both sexes)? 
-# Your answer should contain 50 values (one for each state)
+# Your answer should contain 50 values (one for each state), unless there are two counties in a state with the same value
 # Your answer should be a *dataframe* with the value of interest, location, and state
 
 
