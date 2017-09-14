@@ -11,18 +11,21 @@
 # Read in `binge.drinking.csv` data using a relative path
 
 # Create a directory (using R) called "output" in your project directory
+# Make sure to suppress any warnings, in case the directory already exists
 
 ################################### Any drinking in 2012 ###################################
 
-# For this first section, let's just work with the columns `state`, `location`, and the data from 2012
-# (from the *any drinking* dataset)
-# Create a data.frame that has the `state` and `location` columns, and all columns from 2012
+# For this first section, you will work only with the *any drinking* dataset.
+# In particular, we'll focus on data from 2012, keeping track of the `state` and `location` variables
+
+# Create a data.frame that has the `state` and `location` columns, and all columns with data from 2012
 
 
 # Using the 2012 data, create a column that has the difference in male and female drinking patterns
 
 
 # Write your 2012 data to a .csv file in your `output/` directory with an expressive filename
+# Make sure to exclude rownames
 
 
 # Are there any locations where females drink more than males?
@@ -36,7 +39,7 @@
 # As you've (hopefully) noticed, the `location` column includes national, state, and county level estimates. 
 # However, many audiences may only be interested in the *state* level data. Given that, you should do the following:
 # Create a new variable that is only the state level observations in 2012
-
+# For the sake of this analysis, you should treat Washington D.C. as a *state*
 
 # Which state had the **highest** drinking rate for both sexes combined? 
 # Your answer should be a *dataframe* of the state and value of interest (no extra columns)
@@ -52,34 +55,38 @@
 
 
 # Write your 2012 state data to an appropriately named file in your `output/` directory
+# Make sure to exclude rownames
 
 
 # Write a function that allows you to specify a state, then saves a .csv file with only observations from that state
+# This includes data about the state itself, as well as the counties within the state
 # You should use the entire any.drinking dataset for this function
-# Make sure the file you save in the `output` directory indicates the state name, and avoid using rownames.
+# The file you save in the `output` directory indicates the state name
+# Make sure to exclude rownames
 
 
-# Demonstrate your function works by writing 3 .csv files of the states of your choice
+# Demonstrate your function works by passing 3 states of your choice to the function
 
 
 ################################### Binge drinking Dataset ###################################
-# In this section, we'll ask a variety of questions regarding our binge.drinking dataset. 
-# In order to ask these questions, you'll need to first prepare a subset of the data for this section:
-  
-# Create a dataframe with only the county level observations from the binge_driking dataset 
+# In this section, we'll ask a variety of questions regarding our binge.drinking dataset
+# Moreover, we'll be looking at a subset of the observations which is just the counties 
 # (i.e., exclude state/national estimates)
-# This should include "county-like" areas such as parishes and boroughs
+# In order to ask these questions, you'll need to first prepare a subset of the data for this section:
 
-  
-# What is the average county level of binge drinking in 2012 for both sexes?
+# Create a dataframe with only the county level observations from the binge_driking dataset 
+# You should (again) think of Washington D.C. as a state, and therefore *exclude it here*
+# This does include "county-like" areas such as parishes and boroughs
 
-
-# What is the minimum county level of binge drinking in each state (in 2012 for both sexes)? 
-# Your answer should contain 50 values (one for each state), unless there are two counties in a state with the same value
-# Your answer should be a *dataframe* with the value of interest, location, and state
+# What is the average level of binge drinking in 2012 for both sexes (across the counties)?
 
 
-# What is the maximum county level of binge drinking in each state (in 2012 for both sexes)? 
+# What is the *minimum* level of binge drinking in each state in 2012 for both sexes (across the counties)? 
+# Your answer should contain roughly 50 values (one for each state), unless there are two counties in a state with the same value
+# Your answer should be a *dataframe* with the 2012 binge drinking rate, location, and state
+
+
+# What is the *maximum* level of binge drinking in each state in 2012 for both sexes (across the counties)? 
 # Your answer should be a *dataframe* with the value of interest, location, and state
 
 
@@ -120,10 +127,10 @@
 
 
 # Then, create a dataframe with all of the columns from both datasets. 
-# You can do this by performing a full join on the two datasets by the `location` column
+# Think carefully about the *type* of join you want to do, and what the *identifying columns* are
 
 
-# Create a column of difference b/w `any` and `binge` drinking for both sexes in 2012
+# Create a column of difference between `any` and `binge` drinking for both sexes in 2012
 
 
 # Which location has the greatest *absolute* difference between `any` and `binge` drinking?
@@ -145,15 +152,21 @@
 
 ################################### Challenge ###################################
 
-# Using your function from part 1 that wrote a .csv file for given a state name, write a file for all 50 states
-# You should be able to do this in a *single line of (concise) code*
+# Using your function from part 1 (that wrote a .csv file given a state name), write a separate file 
+# for each of the 51 states (including Washington D.C.)
+# The challenge is to do this in a *single line of (concise) code*
 
 
 # Using a dataframe of your choice from above, write a function that allows you to specify a *year* and *state* of interest, 
-# that saves a csv file with observations from that state's counties. 
+# that saves a .csv file with observations from that state's counties (and the state itself) 
 # It should only write the columns `state`, `location`, and data from the specified year. 
 # Before writing the .csv file, you should *sort* the data.frame in descending order
 # by the both_sexes drinking rate in the specified year. 
 # Again, make sure the file you save in the output directory indicates the year and state. 
 # Note, this will force you to confront how dplyr uses *non-standard evaluation*
 # Hint: https://cran.r-project.org/web/packages/dplyr/vignettes/nse.html
+# Make sure to exclude rownames
+
+
+# Demonstrate that your function works by passing a year and state of your interest to the function
+
