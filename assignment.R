@@ -210,7 +210,6 @@ GetAverages("2012")
 # for each of the 51 states (including Washington D.C.)
 # The challenge is to do this in a *single line of (concise) code*
 any.drinking <- read.csv("./data/any_drinking.csv", stringsAsFactors = FALSE)
-
 lapply(only.state$state, GetState)
 
 
@@ -229,12 +228,8 @@ GetCounties <- function(what.year, what.state) {
   county.data  <- any.drinking %>%
     filter(state == what.state) %>%
     select(state, location, contains(what.year)) 
-  
   sorted.county <- arrange(county.data, desc(county.data[,3]))
-  
-  View(sorted.county)
   write.csv(sorted.county, file = paste0("output/", what.year, " data from ", what.state, ".csv" ), row.names = FALSE)
-  
 }
 
 
