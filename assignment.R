@@ -31,8 +31,7 @@ View(data.2012)
 # Write your 2012 data to a .csv file in your `output/` directory with an expressive filename
 # Make sure to exclude rownames
 getwd()
-setwd("./output")
-write.csv(data.2012, file = "2012 data.csv", row.names = FALSE)
+write.csv(data.2012, file = "output/2012 data.csv", row.names = FALSE)
 # Are there any locations where females drink more than males?
 # Your answer should be a *dataframe* of the locations, states, and differences for all locations (no extra columns)
 females.more <- data.2012 %>%
@@ -71,7 +70,7 @@ select(highest.data, 2) - select(lowest.data, 2)
   
 # Write your 2012 state data to an appropriately named file in your `output/` directory
 # Make sure to exclude rownames
-write.csv(only.state, file = "2012 state data.csv", row.names = FALSE)
+write.csv(only.state, file = "output/2012 state data.csv", row.names = FALSE)
 
 # Write a function that allows you to specify a state, then saves a .csv file with only observations from that state
 # This includes data about the state itself, as well as the counties within the state
@@ -81,10 +80,9 @@ write.csv(only.state, file = "2012 state data.csv", row.names = FALSE)
 GetState <- function(state.name) {
  state.selected.data <- any.drinking %>%
       filter(state == state.name) 
-
-  write.csv(state.selected.data, file = paste(state.name, "data from 2012.csv"), row.names = FALSE)
+ write.csv(state.selected.data, file = paste0("output/", state.name, " data from 2012.csv" ), row.names = FALSE)
 }
-# Demonstrate your function works by passing 3 states of your choice to the function
+# Demonstrate your fun8ction works by passing 3 states of your choice to the function
 GetState("Alaska")
 GetState("California")
 GetState("New York")
@@ -97,9 +95,9 @@ GetState("New York")
 # Create a dataframe with only the county level observations from the binge_driking dataset 
 # You should (again) think of Washington D.C. as a state, and therefore *exclude it here*
 # This does include "county-like" areas such as parishes and boroughs
-only.county <- binge.drinking %>%
-  filter(state != location, state != "National")
-  
+only.county <- as.data.frame(binge.drinking %>%
+  filter(state != location, state != "National"))
+
 View(only.county)
 # What is the average level of binge drinking in 2012 for both sexes (across the counties)?
 only.county %>%
@@ -170,7 +168,7 @@ female.rise.male.decline <- binge.drinking %>%
 
 # First, rename all prevalence columns in the any.drinking dataset to the have prefix "any."
 # Hint: you can get (and set!) column names using the colnames function. This may take multiple lines of code.
-colnames(any.drinking)[3:length(any.drinking)] <- paste("any.", colnames(any.drinking)[3:length(any.drinking)])
+colnames(any.drinking)[3:length(any.drinking)] <- paste0("any.", colnames(any.drinking)[3:length(any.drinking)])
 View(any.drinking)
  # Then, rename all prevalence columns in the binge.drinking dataset to the have prefix "binge."
 # Hint: you can get (and set!) column names using the colnames function. This may take multiple lines of code.
@@ -237,15 +235,16 @@ lapply(only.state$state, GetState)
 # Hint: https://cran.r-project.org/web/packages/dplyr/vignettes/nse.html
 # Make sure to exclude rownames
 GetCounties <- function(what.year, what.state) {
-  any.drinking %>%
+county.data  <- any.drinking %>%
     filter(state == what.state) %>%
-    select(state, location, contains(what.year)) %>% 
+    select(state, location, contains(what.year)) 
+
+    arrange(county.data, desc(county.data[, 3]))
     
+    write.csv(county.data, file = paste0("output/", what.year, " data from ", what.state, ".csv" ), row.names = FALSE)
     
 }
 
-any.drinking
 
-GetCounties("2005", "Alaska")
 # Demonstrate that your function works by passing a year and state of your interest to the function
-
+GetCounties("2012", "Alaska")
