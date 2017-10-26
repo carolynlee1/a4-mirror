@@ -90,8 +90,8 @@ GetState("New York")
 # Create a dataframe with only the county level observations from the binge_driking dataset 
 # You should (again) think of Washington D.C. as a state, and therefore *exclude it here*
 # This does include "county-like" areas such as parishes and boroughs
-only.county <- as.data.frame(binge.drinking %>%
-  filter(state != location, state != "National"))
+only.county <- binge.drinking %>%
+  filter(state != location, state != "National")
 
 
 # What is the average level of binge drinking in 2012 for both sexes (across the counties)?
@@ -138,7 +138,7 @@ round(increased.males.data / count(binge.drinking) * 100, digits = 1)
 # Your answer should be an integer (a dataframe with only one value is fine)
 binge.drinking <- mutate(binge.drinking, females.diff = females_2012 - females_2002) 
 
-binge.drinking %>%
+increase.in.female <- binge.drinking %>%
   filter(females.diff > 0) %>%
   count()
 
@@ -151,7 +151,6 @@ round(increased.females.data / count(binge.drinking) * 100, digits = 1)
 female.rise.male.decline <- binge.drinking %>%
   filter(females.diff > 0 & males.diff < 0) %>%
   count()
-
 
 ################################### Joining Data ###################################
 # You'll often have to join different datasets together in order to ask more involved questions of your dataset. 
@@ -210,6 +209,7 @@ GetAverages("2012")
 # for each of the 51 states (including Washington D.C.)
 # The challenge is to do this in a *single line of (concise) code*
 any.drinking <- read.csv("./data/any_drinking.csv", stringsAsFactors = FALSE)
+
 lapply(only.state$state, GetState)
 
 
