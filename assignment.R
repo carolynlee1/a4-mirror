@@ -22,36 +22,31 @@ dir.create("output", showWarnings = FALSE)
 # In particular, we'll focus on data from 2012, keeping track of the `state` and `location` variables
 
 # Create a data.frame that has the `state` and `location` columns, and all columns with data from 2012
-View(any.drinking)
 data.2012 <- select(any.drinking, state, location, both_sexes_2012, males_2012, females_2012)
-View(data.2012)
 # Using the 2012 data, create a column that has the difference in male and female drinking patterns
-data.2012 <- mutate(data.2012, diff = males_2012 - females_2012)
-View(data.2012)
+data.2012 <- mutate(data.2012, diff.male.female = males_2012 - females_2012)
 # Write your 2012 data to a .csv file in your `output/` directory with an expressive filename
 # Make sure to exclude rownames
 getwd()
-write.csv(data.2012, file = "output/2012 data.csv", row.names = FALSE)
+write.csv(data.2012, file = "output/2012 any drinking NATION data.csv", row.names = FALSE)
 # Are there any locations where females drink more than males?
 # Your answer should be a *dataframe* of the locations, states, and differences for all locations (no extra columns)
 females.more <- data.2012 %>%
-  filter(diff < 0) %>%
-  select(location, state, diff)
-View(females.more)
+  filter(diff.male.female < 0) %>%
+  select(location, state, diff.male.female)
+
 # What is the location in which male and female drinking rates are most similar (*absolute* difference is smallest)?
 # Your answer should be a *dataframe* of the location, state, and value of interest (no extra columns)
 most.similar <- data.2012 %>%
-  filter(diff == min(abs(diff))) %>%
-  select(location, state, diff)
-View(most.similar)
-
+  filter(diff.male.female == min(abs(diff.male.female))) %>%
+  select(location, state, diff.male.female)
 
        # As you've (hopefully) noticed, the `location` column includes national, state, and county level estimates. 
 # However, many audiences may only be interested in the *state* level data. Given that, you should do the following:
 # Create a new variable that is only the state level observations in 2012
 # For the sake of this analysis, you should treat Washington D.C. as a *state*
-View(data.2012)
 only.state <- filter(data.2012, location == state)
+
 # Which state had the **highest** drinking rate for both sexes combined? 
 # Your answer should be a *dataframe* of the state and value of interest (no extra columns)
 highest.data <- only.state %>%
@@ -66,11 +61,11 @@ lowest.data <- only.state %>%
 # What was the difference in (any-drinking) prevalence between the state with the highest level of consumption, 
 # and the state with the lowest level of consumption?
 # Your answer should be a single value (a dataframe storing one value is fine)
-select(highest.data, 2) - select(lowest.data, 2)
+highest.minus.lowest <- select(highest.data, 2) - select(lowest.data, 2)
   
 # Write your 2012 state data to an appropriately named file in your `output/` directory
 # Make sure to exclude rownames
-write.csv(only.state, file = "output/2012 state data.csv", row.names = FALSE)
+write.csv(only.state, file = "output/2012 any drinking STATE data.csv", row.names = FALSE)
 
 # Write a function that allows you to specify a state, then saves a .csv file with only observations from that state
 # This includes data about the state itself, as well as the counties within the state
@@ -98,9 +93,9 @@ GetState("New York")
 only.county <- as.data.frame(binge.drinking %>%
   filter(state != location, state != "National"))
 
-View(only.county)
+
 # What is the average level of binge drinking in 2012 for both sexes (across the counties)?
-only.county %>%
+average.both.sexes.2012 <- only.county %>%
   summarise(
     mean = mean(both_sexes_2012)
   )
@@ -113,44 +108,40 @@ state.min <- only.county %>%
   filter(both_sexes_2012 == min(both_sexes_2012)) %>% 
   select(both_sexes_2012, location, state)
  
-View(state.min)
+
 # What is the *maximum* level of binge drinking in each state in 2012 for both sexes (across the counties)? 
 # Your answer should be a *dataframe* with the value of interest, location, and state
 state.max <- only.county %>%
   group_by(state) %>%
   filter(both_sexes_2012 == max(both_sexes_2012)) %>% 
   select(both_sexes_2012, location, state)
-View(state.max)
+
 # What is the county with the largest increase in male binge drinking between 2002 and 2012?
 # Your answer should include the county, state, and value of interest
-binge.drinking %>%
-  mutate(males.diff = males_2002 - males_2012) %>%
-  filter(males.diff == max(males.diff)) %>%
+binge.drinking <- mutate(binge.drinking, males.diff = males_2002 - males_2012) 
+  
+largest.increase <- binge.drinking %>%
+  filter(males.diff == max(males.diff)) %>% 
   select(location, state, males.diff)
 
-View(binge.drinking)
-  
 # How many counties experienced an increase in male binge drinking between 2002 and 2012?
 # Your answer should be an integer (a dataframe with only one value is fine)
-
 increased.males.data <- binge.drinking %>%
   filter(males.diff > 0) %>%
   count()
  
-View(increased.males.data)
 # What percentage of counties experienced an increase in male binge drinking between 2002 and 2012?
 # Your answer should be a fraction or percent (we're not picky)
 round(increased.males.data / count(binge.drinking) * 100, digits = 1)
                     
 # How many counties observed an increase in female binge drinking in this time period?
 # Your answer should be an integer (a dataframe with only one value is fine)
+binge.drinking <- mutate(binge.drinking, females.diff = females_2012 - females_2002) 
 
-increased.females.data <- binge.drinking %>%
-  mutate(females.diff = females_2012 - females_2002) %>%
+binge.drinking %>%
   filter(females.diff > 0) %>%
   count()
 
-View(increased.females.data)
 # What percentage of counties experienced an increase in female binge drinking between 2002 and 2012?
 # Your answer should be a fraction or percent (we're not picky)
 round(increased.females.data / count(binge.drinking) * 100, digits = 1)
@@ -169,15 +160,15 @@ female.rise.male.decline <- binge.drinking %>%
 # First, rename all prevalence columns in the any.drinking dataset to the have prefix "any."
 # Hint: you can get (and set!) column names using the colnames function. This may take multiple lines of code.
 colnames(any.drinking)[3:length(any.drinking)] <- paste0("any.", colnames(any.drinking)[3:length(any.drinking)])
-View(any.drinking)
+
  # Then, rename all prevalence columns in the binge.drinking dataset to the have prefix "binge."
 # Hint: you can get (and set!) column names using the colnames function. This may take multiple lines of code.
-colnames(binge.drinking)[3:length(binge.drinking)] <- paste("binge.", colnames(binge.drinking)[3:length(binge.drinking)])
-View(binge.drinking)
+colnames(binge.drinking)[3:length(binge.drinking)] <- paste0("binge.", colnames(binge.drinking)[3:length(binge.drinking)])
+
 # Then, create a dataframe with all of the columns from both datasets. 
 # Think carefully about the *type* of join you want to do, and what the *identifying columns* are
 both.drinking <- full_join(any.drinking, binge.drinking)
-View(both.drinking)
+
 # Create a column of difference between `any` and `binge` drinking for both sexes in 2012
 any.binge.diff <- both.drinking %>% 
   select(contains("both_sexes_2012")) %>%
@@ -185,18 +176,15 @@ any.binge.diff <- both.drinking %>%
   
 both.drinking <- mutate(both.drinking, diff.any.binge = any.binge.diff$diff)
 
-View(any.binge.diff)
-View(both.drinking)
-
 # Which location has the greatest *absolute* difference between `any` and `binge` drinking?
 # Your answer should be a one row data frame with the state, location, and value of interest (difference)
-both.drinking %>%
+greatest.diff <- both.drinking %>%
   filter(diff.any.binge == abs(max(diff.any.binge))) %>%
   select(state, location, diff.any.binge)
 
 # Which location has the smallest *absolute* difference between `any` and `binge` drinking?
 # Your answer should be a one row data frame with the state, location, and value of interest (difference)
-both.drinking %>%
+smallest.diff <- both.drinking %>%
   filter(diff.any.binge == min(abs(diff.any.binge))) %>%
   select(state, location, diff.any.binge)
 
@@ -207,6 +195,7 @@ both.drinking %>%
 # For example, you may want to ask about the highest/lowest drinking level given a state or year. 
 # The purpose of your function should be evident given the input parameters and function name. 
 # After writing your function, *demonstrate* that the function works by passing in different parameters to your function.
+
 GetAverages <- function(year) {
   any.drinking %>%
     select(contains(year)) %>%
@@ -220,6 +209,7 @@ GetAverages("2012")
 # Using your function from part 1 (that wrote a .csv file given a state name), write a separate file 
 # for each of the 51 states (including Washington D.C.)
 # The challenge is to do this in a *single line of (concise) code*
+any.drinking <- read.csv("./data/any_drinking.csv", stringsAsFactors = FALSE)
 
 lapply(only.state$state, GetState)
 
@@ -234,17 +224,20 @@ lapply(only.state$state, GetState)
 # Note, this will force you to confront how dplyr uses *non-standard evaluation*
 # Hint: https://cran.r-project.org/web/packages/dplyr/vignettes/nse.html
 # Make sure to exclude rownames
+
 GetCounties <- function(what.year, what.state) {
-county.data  <- any.drinking %>%
+  county.data  <- any.drinking %>%
     filter(state == what.state) %>%
     select(state, location, contains(what.year)) 
-
-    arrange(county.data, desc(county.data[, 3]))
-    
-    write.csv(county.data, file = paste0("output/", what.year, " data from ", what.state, ".csv" ), row.names = FALSE)
-    
+  
+  sorted.county <- arrange(county.data, desc(county.data[,3]))
+  
+  View(sorted.county)
+  write.csv(sorted.county, file = paste0("output/", what.year, " data from ", what.state, ".csv" ), row.names = FALSE)
+  
 }
 
 
 # Demonstrate that your function works by passing a year and state of your interest to the function
-GetCounties("2012", "Alaska")
+GetCounties("2002", "California")
+
